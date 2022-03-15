@@ -43,7 +43,7 @@ router.post("/signup", async (req, res) => {
   const { name, age, email, password } = req.body;
   const myObj = JSON.stringify(req.body);
 
-  fs.appendFile("myJson.json", myObj, (err) => {
+  fs.writeFile("myJson.json", myObj, (err) => {
     err ? console.log(err.message) : console.log("Saved Sucessfully");
   });
 });
