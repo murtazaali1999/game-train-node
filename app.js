@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
-app.use(express.urlencoded({ extended: true })); //for using body parser
-/* app.use(express.json({})); */ // for parsing json
+app.use(express.urlencoded({ extended: true })); //for parsing object (strings/arrays), on POST/PUT request
+app.use(express.json({})); // for parsing json object, on POST/PUT request
 
 const admin = require("./routes/admin");
 const shop = require("./routes/shop");
@@ -18,4 +18,8 @@ app.listen(PORT, async () => {
 app.get("/", async (req, res) => {
   res.send(`
     <h1>Welcome Page</h1>`);
+});
+
+app.post("/testRoute", async (req, res) => {
+  console.log(req.body);
 });

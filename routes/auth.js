@@ -1,7 +1,6 @@
 const express = require("express");
 const fs = require("fs"); //fs = File System
 const router = express.Router();
-
 router.get("/get/signupForm", async (req, res) => {
   return res.send(` <form method='POST' action="/signup">
     <div>
@@ -38,13 +37,31 @@ router.get("/get/signinForm", async (req, res) => {
     </div>
 </form>`);
 });
-
 router.post("/signup", async (req, res) => {
   const { name, age, email, password } = req.body;
-  const myObj = JSON.stringify(req.body);
 
-  fs.writeFile("myJson.json", myObj, (err) => {
-    err ? console.log(err.message) : console.log("Saved Sucessfully");
+  fs.readFile("myJson.json", "utf8", (err, data) => {
+    if (data.length == 0) {
+      console.log("no data in exsiting file");
+      //if file already exists
+      //make list here
+      //also insert
+      const myList = [];
+      myList.push(req.body);
+      fs.writeFile("myJson.json", JSON.stringify(myList), (err) => {
+        err ? console.log(err.message) : console.log("Saved Sucessfully");
+      });
+    } else {
+      console.log("data in exsiting file");
+      //take list and insert
+      const myList = JSON.parse(data);
+      myList.push(req.body);
+      const newList = JSON.stringify(myList);
+      console.log(newList);
+      fs.writeFile("myJson.json", newList, (err) => {
+        err ? console.log(err.message) : console.log("Saved Sucessfully");
+      });
+    }
   });
 });
 
@@ -53,17 +70,14 @@ router.post("/signin", async (req, res) => {
   let myObj = null;
 
   fs.readFile("myJson.json", "utf8", (err, data) => {
-    const myObj = JSON.parse(data);
-    console.log(myObj);
-    console.log(
-      myObj?.email,
-      req.body.email,
-      myObj?.password,
-      req.body.password
-    );
-    myObj?.email == req.body.email && myObj?.password == req.body.password
-      ? res.redirect("/welcomePage")
-      : res.redirect("/get/signinForm");
+    const myList = JSON.parse(data);
+    let userCheck = false;
+    myList.map((user) => {
+      if (user.email == req.body.email && user.password == req.body.password) {
+        userCheck = true;
+      }
+    });
+    userCheck ? res.redirect("/welcomePage") : res.redirect("/get/signinForm");
   });
 });
 
