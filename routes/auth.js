@@ -58,15 +58,14 @@ router.post("/signup", async (req, res) => {
       const myList = JSON.parse(data);
       myList.push(req.body);
       const newList = JSON.stringify(myList);
-      console.log(newList);
       fs.writeFile("myJson.json", newList, (err) => {
-        err ? console.log(err.message) : console.log("Saved Sucessfully");
+        err ? res.status(400).json({message:"There was an error saving credentials"}) : res.status(200).json({message:"Credentials saved successfully"})
       });
     }
   });
 });
 
-router.post("/signin", async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   let myObj = null;
 
@@ -74,11 +73,12 @@ router.post("/signin", async (req, res) => {
     const myList = JSON.parse(data);
     let userCheck = false;
     myList.map((user) => {
-      if (user.email == req.body.email && user.password == req.body.password) {
+      console.log(user)
+      if (user.email == email && user.password == password) {
         userCheck = true;
       }
     });
-    userCheck ? res.redirect("/welcomePage") : res.redirect("/get/signinForm");
+    userCheck ? res.status(200).json({message:"Welcome User"}) : res.status(403).json({message:"This user does not exist"});
   });
 });
 
