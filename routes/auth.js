@@ -37,6 +37,7 @@ router.get("/get/signinForm", async (req, res) => {
     </div>
 </form>`);
 });
+
 router.post("/signup", async (req, res) => {
   const { name, age, email, password } = req.body;
 
