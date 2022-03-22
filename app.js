@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 app.use(express.urlencoded({ extended: true })); //for parsing object (strings/arrays), on POST/PUT request
 app.use(express.json({})); // for parsing json object, on POST/PUT request
+const validator = require("validator");
 
 const admin = require("./routes/admin");
 const shop = require("./routes/shop");

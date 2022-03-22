@@ -2,19 +2,24 @@ const express = require("express");
 
 const router = express.Router();
 
-router.get("/post/addproduct", async (req, res) => {
-  res.send(`
-  <form method='POST' action="/product">
-        <div>
-            <input type= 'text' name='product' />
-            <button type='submit'> Add Product </button>
-        </div>
-  </form>
-  `);
-});
+/* Routes Structure
+Route
+Middleware
+Validator
+Controller
+*/
 
-router.post("/product", async (req, res) => {
-  res.send(req.body);
-});
+//Importing all Controllers
+const adminController = require("../controllers/adminController");
+
+//Importing all Middleware
+const adminMiddleware = require("../middlewares/adminMiddleware");
+
+//defining routes
+router.post(
+  "/addproduct",
+  adminMiddleware.addProductMiddleware,
+  adminController.addProductController
+);
 
 module.exports = router;
