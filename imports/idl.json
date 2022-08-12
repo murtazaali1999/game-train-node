@@ -1,0 +1,186 @@
+{
+    "version": "0.1.0",
+    "name": "challenge",
+    "instructions": [
+      {
+        "name": "createChallenge",
+        "accounts": [
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "challangeSigner", "isMut": true, "isSigner": true },
+          { "name": "systemProgram", "isMut": false, "isSigner": false }
+        ],
+        "args": [
+          { "name": "name", "type": "string" },
+          { "name": "numberOfLevels", "type": "u64" }
+        ]
+      },
+      {
+        "name": "initializeChallenge",
+        "accounts": [
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "challangeSigner", "isMut": false, "isSigner": true }
+        ],
+        "args": [
+          { "name": "name", "type": "string" },
+          { "name": "numberOfLevels", "type": "u64" }
+        ]
+      },
+      {
+        "name": "createPlayer",
+        "accounts": [
+          { "name": "player", "isMut": true, "isSigner": false },
+          { "name": "playerSigner", "isMut": true, "isSigner": true },
+          { "name": "systemProgram", "isMut": false, "isSigner": false }
+        ],
+        "args": []
+      },
+      {
+        "name": "initializePlayer",
+        "accounts": [
+          { "name": "player", "isMut": true, "isSigner": false },
+          { "name": "playerSigner", "isMut": true, "isSigner": true },
+          { "name": "challenge", "isMut": true, "isSigner": false }
+        ],
+        "args": []
+      },
+      {
+        "name": "enterFirstchallenge",
+        "accounts": [
+          { "name": "player", "isMut": true, "isSigner": false },
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "user", "isMut": true, "isSigner": true },
+          { "name": "systemProgram", "isMut": false, "isSigner": false }
+        ],
+        "args": []
+      },
+      {
+        "name": "enterChallenge",
+        "accounts": [
+          { "name": "player", "isMut": true, "isSigner": false },
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "user", "isMut": false, "isSigner": true },
+          { "name": "systemProgram", "isMut": false, "isSigner": false }
+        ],
+        "args": []
+      },
+      {
+        "name": "printPda",
+        "accounts": [
+          { "name": "challangeSigner", "isMut": true, "isSigner": true },
+          { "name": "systemProgram", "isMut": false, "isSigner": false }
+        ],
+        "args": []
+      },
+      {
+        "name": "winnerWithdraw",
+        "accounts": [
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "challangeSigner", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "platformWithdraw",
+        "accounts": [
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "challangeSigner", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "setWinner",
+        "accounts": [
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "signer", "isMut": false, "isSigner": true },
+          { "name": "winner", "isMut": false, "isSigner": false }
+        ],
+        "args": []
+      },
+      {
+        "name": "getWinner",
+        "accounts": [{ "name": "challenge", "isMut": true, "isSigner": false }],
+        "args": []
+      },
+      {
+        "name": "awardPoints",
+        "accounts": [
+          { "name": "player", "isMut": true, "isSigner": false },
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "signer", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "endChallenge",
+        "accounts": [
+          { "name": "challenge", "isMut": true, "isSigner": false },
+          { "name": "signer", "isMut": false, "isSigner": true }
+        ],
+        "args": []
+      },
+      {
+        "name": "getPlayer",
+        "accounts": [{ "name": "player", "isMut": true, "isSigner": false }],
+        "args": []
+      }
+    ],
+    "accounts": [
+      {
+        "name": "Challenge",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            { "name": "admin", "type": "publicKey" },
+            { "name": "name", "type": "string" },
+            { "name": "pool", "type": "u64" },
+            { "name": "winnerPoints", "type": "u64" },
+            { "name": "winner", "type": { "vec": "publicKey" } },
+            { "name": "winnerPrize", "type": "u64" },
+            { "name": "platformFee", "type": "u64" },
+            { "name": "isOpen", "type": "bool" },
+            { "name": "numberOfLevels", "type": "u64" }
+          ]
+        }
+      },
+      {
+        "name": "Player",
+        "type": {
+          "kind": "struct",
+          "fields": [
+            { "name": "hasPaid", "type": "bool" },
+            { "name": "isWinner", "type": "bool" },
+            { "name": "challengePoints", "type": "u64" },
+            { "name": "playerId", "type": "publicKey" },
+            { "name": "levelsPlayed", "type": "u64" }
+          ]
+        }
+      }
+    ],
+    "errors": [
+      {
+        "code": 6000,
+        "name": "NotAdmin",
+        "msg": "only admin can perform this operation"
+      },
+      {
+        "code": 6001,
+        "name": "NotWinner",
+        "msg": "only winner can perform this operation"
+      },
+      { "code": 6002, "name": "NotClosed", "msg": "Challenge is still open" },
+      { "code": 6003, "name": "NotOpen", "msg": "Challenge is not open" },
+      { "code": 6004, "name": "NotPaid", "msg": "player has not paid" },
+      {
+        "code": 6005,
+        "name": "NotInitializer",
+        "msg": "account cannot initialize player"
+      },
+      {
+        "code": 6006,
+        "name": "HasPlayed",
+        "msg": "Player has already played maximum challenges"
+      }
+    ],
+    "metadata": { "address": "F58sUWPFqiX79fqTjYAvWAuP9hTKdz6bZq4CzqkwEMU1" }
+  }
+  

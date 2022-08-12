@@ -1,26 +1,37 @@
+//Imports
 const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
 const app = express();
-app.use(express.urlencoded({ extended: true })); //for parsing object (strings/arrays), on POST/PUT request
-app.use(express.json({})); // for parsing json object, on POST/PUT request
-const validator = require("validator");
+const index = require("./library/index");
 
-const admin = require("./routes/admin");
-const shop = require("./routes/shop");
-const auth = require("./routes/auth");
+require("dotenv").config();
 
-app.use([admin, shop, auth]);
+//ENV//
+const PORT = process.env.PORT;
+const MONGOURI = process.env.MONGOURI;
 
-const PORT = 4444;
+//Middlewares//
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({}));
+app.use(cors());
 
-app.listen(PORT, async () => {
-  console.log(`Server is running on port #${PORT}`);
+//Models
+require("./models/transactionsModel");
+
+//Routes//
+const transaction = require("./routes/tranasactionsRoutes");
+app.use([transaction]);
+
+//Connection//
+mongoose.connect(MONGOURI, () => {
+  console.log("MongoDB connection made successfully");
+  app.listen(PORT, () => {
+    console.log(`Server is running on port #${PORT}`);
+  });
 });
 
+//TestConnection//
 app.get("/", async (req, res) => {
-  res.send(`
-    <h1>Welcome Page</h1>`);
-});
-
-app.post("/testRoute", async (req, res) => {
-  console.log(req.body);
+  res.send("<h1>Connection Working</h1>")
 });
