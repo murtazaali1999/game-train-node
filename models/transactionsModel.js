@@ -12,8 +12,12 @@ const transactionSchema = new mongoose.Schema(
           "WithdrawPlatformMoney",
           "EndChallenge",
           "AwardPointsToWinner",
+          "EnterFirstChallenge",
           "EnterChallenge",
           "WithdrawPrizeMoney",
+          "PrintPDA",
+          "getWinner",
+          "getPlayer",
         ],
       },
       default: "None",
@@ -22,7 +26,7 @@ const transactionSchema = new mongoose.Schema(
       enum: { values: ["Admin", "User"] },
     },
     signers: [{ type: String, default: null }],
-    hash:{type:String}
+    hash: { type: String },
   },
   { timestamps: true } //to keep track of when were changes made to transactions
 );

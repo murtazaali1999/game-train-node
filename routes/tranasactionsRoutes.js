@@ -8,14 +8,61 @@ const transactionController = require("../controllers/transactionController");
 //importing all middleware
 const transactionMiddleware = require("../middlewares/transactionsMiddleware");
 
+router.post(
+  "/initialize-challenge",
+  transactionMiddleware.initChallengeMiddleware,
+  transactionController.initializeChallenge
+);
+router.post(
+  "/create-challenge",
+  transactionMiddleware.initChallengeMiddleware,
+  transactionController.createNewChallenge
+);
 
-router.post("/initialize-challenge",transactionController.initializeChallenge);
-router.post("/create-challenge",transactionController.createNewChallenge);
-router.post("/initialize-player",transactionController.initializePlayer);
-router.post("/withdraw-platform-money",transactionController.withdrawPlatformMoney);
-router.post("/end-challenge",transactionController.endChallenge);
-router.post("/award-points-to-winner",transactionController.awardPointsToWinner);
-router.post("/withdraw-prize-money",transactionController.withdrawPrizeMoney);
+router.post(
+  "/enter-first-challenge",
+  transactionMiddleware.enterChallengeMiddleware,
+  transactionController.enterFirstChallenge
+);
+router.post(
+  "/enter-challenge",
+  transactionMiddleware.enterChallengeMiddleware,
+  transactionController.enterChallenge
+);
+
+router.post(
+  "/withdraw-prize-money",
+  transactionMiddleware.withdrawPrizeAndPrintPDAMiddleware,
+  transactionController.withdrawPrizeMoney
+);
+router.post(
+  "/print-pda",
+  transactionMiddleware.withdrawPrizeAndPrintPDAMiddleware,
+  transactionController.printPDA
+);
+
+router.post(
+  "/initialize-player",
+  transactionMiddleware.initializePlayerMiddleware,
+  transactionController.initializePlayer
+);
+router.post(
+  "/award-points-to-winner",
+  transactionMiddleware.awardPointsToWinnerMiddleware,
+  transactionController.awardPointsToWinner
+);
+router.post(
+  "/get-player",
+  transactionMiddleware.getPlayerMiddleware,
+  transactionController.getPlayer
+);
+
+router.post("/get-winner", transactionController.getWinner);
+router.post("/end-challenge", transactionController.endChallenge);
+router.post(
+  "/withdraw-platform-money",
+  transactionController.withdrawPlatformMoney
+);
 
 //add middleware here,for validations etc
 

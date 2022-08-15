@@ -1,15 +1,13 @@
 //Imports
 const mongoose = require("mongoose");
-const bs58 = require("bs58")
-const { Keypair, PublicKey }  = require("@solana/web3.js");
+const bs58 = require("bs58");
+const { Keypair, PublicKey } = require("@solana/web3.js");
 
 require("dotenv").config();
 require("../models/transactionsModel");
 
-
 //Models
 const Transaction = mongoose.model("Transaction");
-
 
 //ENV
 const BASE_URI = process.env.BASE_SOLANA_EX_URI;
@@ -17,7 +15,6 @@ const SOLANA_NETWORK = process.env.SOLANA_NETWORK;
 
 //for BC transactions
 const transaction = require("../library/index");
-const { publicKey } = require("@project-serum/anchor/dist/cjs/utils");
 
 module.exports = {
   initializeChallenge: async (req, res, next) => {
@@ -33,9 +30,9 @@ module.exports = {
         return res.status(500).json({ error: err.message });
       });
 
-    if(typeof hash != 'string'){
-      return res.status(500).json({transaction:hash});
-  }
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
 
     const newChallenge = new Transaction({
       transactionType: "InitializeChallenge",
@@ -73,8 +70,8 @@ module.exports = {
         return res.status(500).json({ error: err.message });
       });
 
-      if(typeof hash != 'string'){
-        return res.status(500).json({transaction:hash});
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
     }
 
     const challenge = new Transaction({
@@ -108,9 +105,9 @@ module.exports = {
     //convert keypair and wallet check
     const hash = await transaction.initPlayer(player, playerSigner);
 
-    if(typeof hash != 'string'){
-      return res.status(500).json({transaction:hash});
-  }
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
 
     const newPlayer = new Transaction({
       transactionType: "InitializePlayer",
@@ -139,9 +136,9 @@ module.exports = {
       return res.status(500).json({ error: err.message });
     });
 
-    if(typeof hash != 'string'){
-      return res.status(500).json({transaction:hash});
-  }
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
 
     const withdraw = new Transaction({
       transactionType: "WithdrawPlatformMoney",
@@ -171,9 +168,9 @@ module.exports = {
       return res.status(500).json({ error: err.message });
     });
 
-    if(typeof hash != 'string'){
-      return res.status(500).json({transaction:hash});
-  }
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
 
     const challenge = new Transaction({
       transactionType: "EndChallenge",
@@ -211,9 +208,9 @@ module.exports = {
         return res.status(500).json({ error: err.message });
       });
 
-      if(typeof hash != 'string'){
-        console.log("Error==>",hash);
-        return res.status(500).json({transaction:hash});
+    if (typeof hash != "string") {
+      console.log("Error==>", hash);
+      return res.status(500).json({ transaction: hash });
     }
 
     const pointsAward = new Transaction({
@@ -226,8 +223,8 @@ module.exports = {
     pointsAward
       .save()
       .then(() => {
-      console.log("here");
-       return res.status(200).json({message:"Awards given successfully"});
+        console.log("here");
+        return res.status(200).json({ message: "Awards given successfully" });
       })
       .catch((err) => {
         return res.status(500).json({
@@ -237,19 +234,52 @@ module.exports = {
       });
   },
 
-  enterChallenge: async (req, res, next) => {
+  enterFirstChallenge: async (req, res, next) => {
+    const { player, user } = req.body;
 
-    const {player,user} = req.body;
-
-    if(!player||!user) {
-      return res.status(300).json({message:"One or more fields are empty"});
+    if (!player || !user) {
+      return res.status(300).json({ message: "One or more fields are empty" });
     }
 
-    const hash = await transaction.enterChallenge(player,user);
+    const hash = await transaction.enterFirstChallenge(player, user);
 
-    if(typeof hash != 'string'){
-      return res.status(500).json({transaction:hash});
-  }
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
+
+    const challenge = new Transaction({
+      transactionType: "EnterFirstChallenge",
+      userType: "User",
+      signers: ["Admin", "User"],
+      hash: BASE_URI + hash + SOLANA_NETWORK,
+    });
+
+    challenge
+      .save()
+      .then(() => {
+        return res
+          .status(200)
+          .json({ message: "Challenge Entered Successfully" });
+      })
+      .catch((err) => {
+        return res
+          .status(200)
+          .json({ error: "There was an error entering challenge" });
+      });
+  },
+
+  enterChallenge: async (req, res, next) => {
+    const { player, user } = req.body;
+
+    if (!player || !user) {
+      return res.status(300).json({ message: "One or more fields are empty" });
+    }
+
+    const hash = await transaction.enterChallenge(player, user);
+
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
 
     const challenge = new Transaction({
       transactionType: "AwardPointsToWinner",
@@ -272,24 +302,83 @@ module.exports = {
       });
   },
 
-  withdrawPrizeMoney: async (req, res, next) => {
+  printPDA: async (req, res, next) => {
+    const { challangeSigner } = req.body;
 
-    const {challangeSigner} = req.body;
-    console.log(challangeSigner);
-
-    if(!challangeSigner||challangeSigner==null){
-      return res.status(300).json({message:"One or more fields are empty"});
+    if (!challangeSigner) {
+      return res.status(300).json({ message: "One or more fields are empty" });
     }
 
-    console.log("How ??")
+    const hash = await transaction.printPDA(challangeSigner);
 
-    const hash = await transaction.withdrawPrizeMoney(challangeSigner)
-    .catch((err)=>{
-      return res.status(500).json({error:err.message});
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
+
+    const PDA = new Transaction({
+      transactionType: "PrintPDA",
+      userType: "User",
+      signers: ["Admin", "User"],
+      hash: BASE_URI + hash + SOLANA_NETWORK,
     });
 
-    if(typeof hash != 'string'){
-        return res.status(500).json({transaction:hash});
+    PDA.save()
+      .then(() => {
+        return res.status(200).json({ message: "PDA Printed Sucessfully" });
+      })
+      .catch((err) => {
+        return res
+          .status(200)
+          .json({ error: "There was an error priniting PDA" });
+      });
+  },
+
+  getWinner: async (req, res, next) => {
+    const hash = await transaction.getWinner().catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
+
+    const winner = new Transaction({
+      transactionType: "getWinner",
+      userType: "Admin",
+      signers: ["Admin"],
+      hash: BASE_URI + hash + SOLANA_NETWORK,
+    });
+
+    winner
+      .save()
+      .then(() => {
+        return res.status(200).json({ message: "Fetched Winner Successfully" });
+      })
+      .catch((err) => {
+        return res
+          .status(200)
+          .json({ error: "There was an error fetching the Winner" });
+      });
+  },
+
+  withdrawPrizeMoney: async (req, res, next) => {
+    const { challangeSigner } = req.body;
+    console.log(challangeSigner);
+
+    if (!challangeSigner || challangeSigner == null) {
+      return res.status(300).json({ message: "One or more fields are empty" });
+    }
+
+    console.log("How ??");
+
+    const hash = await transaction
+      .withdrawPrizeMoney(challangeSigner)
+      .catch((err) => {
+        return res.status(500).json({ error: err.message });
+      });
+
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
     }
 
     const withdrawPrize = new Transaction({
@@ -300,6 +389,42 @@ module.exports = {
     });
 
     withdrawPrize
+      .save()
+      .then(() => {
+        return res
+          .status(200)
+          .json({ message: "Money Withdrawn Successfully" });
+      })
+      .catch((err) => {
+        return res
+          .status(200)
+          .json({ error: "There was an error withdrawing prize" });
+      });
+  },
+
+  getPlayer: async (req, res, next) => {
+    const { player } = req.body;
+
+    if (!player || player == null) {
+      return res.status(300).json({ message: "One or more fields are empty" });
+    }
+
+    const hash = await transaction.getPlayer(player).catch((err) => {
+      return res.status(500).json({ error: err.message });
+    });
+
+    if (typeof hash != "string") {
+      return res.status(500).json({ transaction: hash });
+    }
+
+    const getPlayer = new Transaction({
+      transactionType: "getPlayer",
+      userType: "User",
+      signers: ["User"],
+      hash: BASE_URI + hash + SOLANA_NETWORK,
+    });
+
+    getPlayer
       .save()
       .then(() => {
         return res

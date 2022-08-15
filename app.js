@@ -33,5 +33,5 @@ mongoose.connect(MONGOURI, () => {
 
 //TestConnection//
 app.get("/", async (req, res) => {
-  res.send("<h1>Connection Working</h1>")
+  res.send("<h1>Connection Working</h1>");
 });
